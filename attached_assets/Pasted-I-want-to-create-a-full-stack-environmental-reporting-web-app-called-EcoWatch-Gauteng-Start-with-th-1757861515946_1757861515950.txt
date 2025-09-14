@@ -1,0 +1,83 @@
+I want to create a full-stack environmental reporting web app called EcoWatch Gauteng. Start with the core features only, so the app is functional, deployable, and usable offline for users without data or airtime.
+
+Core Features:
+
+1. Landing Page (Enhanced):
+
+Logo, slogan, app description
+
+QR code
+
+Contact info: cell 0638051811, email ecowatchgauteng@gmail.com
+
+Prominent Call-to-Action buttons: “Report an Incident” and “View Guides”
+
+Quick stats: number of incidents reported, number of guides available (use in-memory counts for Phase 1)
+
+Visually appealing layout: background image/banner related to conservation/environment, clean design
+
+Responsive for mobile and desktop
+
+Optional: short welcome video or “How to use this app” section
+
+2. Incident Reporting (Offline Support):
+
+Users can report environmental hazards even without data/airtime
+
+Image upload (max 20MB; auto-compress if larger)
+
+Free map (not Google) to pin location
+
+Manual address entry if map fails
+
+Hazard type selection: illegal dumping, sewage spill, illegal electricity connections, chemical spills, air/noise pollution, deforestation, water contamination, wildlife poaching
+
+Reports are stored locally on the device if offline and automatically sent via email when the user is back online
+
+Email sent to the relevant department, CC ecowatchgauteng@gmail.com
+
+User sees confirmation: “Report saved offline” or “Report sent successfully”
+
+3. How-to Guides:
+
+Include 5–6 practical environmental guides (expand later to 13)
+
+Each guide includes video + written instructions
+
+Guides open directly in the app (no PDF downloads)
+
+Offline accessible
+
+4. Environmental Rights:
+
+Local South African laws
+
+International environmental laws
+
+Display clearly and accessibly
+
+Offline accessible
+
+5. Analytics (Basic):
+
+Track number of reports per hazard type
+
+Simple charts/tables, using in-memory data in Phase 1
+
+Offline analytics for reports submitted locally
+
+Technical Requirements:
+
+Frontend: React (or Vue/Svelte) as a Progressive Web App (PWA) for offline functionality
+
+Backend: Node.js + Express
+
+For Phase 1, database is optional — use in-memory or local storage to store reports temporarily
+
+Secure file uploads and image compression
+
+Email functionality via Nodemailer or similar
+
+Responsive design for mobile and desktop
+
+Focus on making Phase 1 fully functional offline, with enhanced landing page, incident reporting, guides, environmental rights info, and basic analytics. Phase 2 will add rewards, gamification, community events, AI hazard detection, leaderboards, offline queue improvements, and notifications.
