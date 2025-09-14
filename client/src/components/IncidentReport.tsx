@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MapPin, Camera, Upload, Wifi, WifiOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 const hazardTypes = [
   { value: 'illegal-dumping', label: 'Illegal Dumping' },
@@ -46,6 +47,7 @@ export default function IncidentReport({ onSubmit }: IncidentReportProps) {
   const [contactInfo, setContactInfo] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isOnline] = useState(navigator.onLine);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,38 +66,91 @@ export default function IncidentReport({ onSubmit }: IncidentReportProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const report = {
-      hazardType,
-      description,
-      location,
-      knownPlace,
-      contactInfo,
-      image: selectedFile,
-      timestamp: new Date().toISOString(),
-      offline: !isOnline
-    };
-    
-    if (onSubmit) {
-      onSubmit(report);
-    }
-    
-    console.log('Incident report submitted:', report);
-    toast({
-      title: isOnline ? "Report Submitted" : "Report Saved Offline",
-      description: isOnline 
-        ? "Your environmental incident has been reported to relevant authorities." 
-        : "Report saved locally. It will be sent when you're back online."
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1]); // Remove data:image/...;base64, prefix
+      };
+      reader.onerror = error => reject(error);
     });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
     
-    // Reset form
-    setHazardType('');
-    setDescription('');
-    setLocation('');
-    setKnownPlace('');
-    setContactInfo('');
-    setSelectedFile(null);
+    try {
+      let imageData = null;
+      let imageName = null;
+      
+      // Convert image to base64 if present
+      if (selectedFile) {
+        imageData = await convertFileToBase64(selectedFile);
+        imageName = selectedFile.name;
+      }
+      
+      const reportData = {
+        hazardType,
+        description,
+        location,
+        knownPlace: knownPlace || null,
+        contactInfo: contactInfo || null,
+        imageData,
+        imageName,
+        status: 'pending' as const
+      };
+      
+      if (!isOnline) {
+        // Save to localStorage for offline submission later
+        const offlineReports = JSON.parse(localStorage.getItem('offlineReports') || '[]');
+        offlineReports.push({ ...reportData, timestamp: new Date().toISOString() });
+        localStorage.setItem('offlineReports', JSON.stringify(offlineReports));
+        
+        toast({
+          title: "Report Saved Offline",
+          description: "Report saved locally. It will be sent when you're back online."
+        });
+      } else {
+        // Submit to API
+        const response = await apiRequest('POST', '/api/incidents', reportData);
+        const result = await response.json();
+        
+        if (result.success) {
+          toast({
+            title: "Report Submitted Successfully",
+            description: "Your environmental incident has been reported to relevant authorities."
+          });
+          
+          // Call onSubmit callback if provided
+          if (onSubmit) {
+            onSubmit(result.incident);
+          }
+        } else {
+          throw new Error(result.error || 'Failed to submit report');
+        }
+      }
+      
+      // Reset form
+      setHazardType('');
+      setDescription('');
+      setLocation('');
+      setKnownPlace('');
+      setContactInfo('');
+      setSelectedFile(null);
+      
+    } catch (error) {
+      console.error('Error submitting incident:', error);
+      toast({
+        title: "Error Submitting Report",
+        description: "There was an error submitting your report. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -222,9 +277,9 @@ export default function IncidentReport({ onSubmit }: IncidentReportProps) {
                 />
               </div>
 
-              <Button type="submit" className="w-full" size="lg" data-testid="button-submit-report">
+              <Button type="submit" className="w-full" size="lg" disabled={isSubmitting} data-testid="button-submit-report">
                 <Upload className="w-4 h-4 mr-2" />
-                {isOnline ? 'Submit Report' : 'Save Offline'}
+                {isSubmitting ? 'Submitting...' : (isOnline ? 'Submit Report' : 'Save Offline')}
               </Button>
             </form>
           </CardContent>
