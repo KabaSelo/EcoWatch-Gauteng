@@ -21,11 +21,11 @@ export default function HeroSection({ onReportClick, onGuidesClick, onRightsClic
       <div className="relative z-10 container mx-auto px-4 py-16">
         <div className="text-center text-white mb-12">
           <h2 className="text-5xl md:text-6xl font-bold mb-6 font-['Poppins']" data-testid="text-hero-title">
-            Protect Our Environment
+            Environmental Warriors Unite
           </h2>
           <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto" data-testid="text-hero-description">
-            Report environmental hazards, access conservation guides, and know your environmental rights. 
-            Together, we can make Gauteng greener and safer for future generations.
+            Join the fight to protect our environment. Report hazards, access conservation guides, and know your rights. 
+            Together, we environmental warriors can make Gauteng greener and safer for future generations.
           </p>
           
           {/* Call-to-Action Buttons */}
@@ -40,18 +40,16 @@ export default function HeroSection({ onReportClick, onGuidesClick, onRightsClic
             </Button>
             <Button 
               size="lg" 
-              variant="outline"
               onClick={onGuidesClick}
-              className="bg-black/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/10 min-w-[200px]"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[200px]"
               data-testid="button-view-guides"
             >
               View Guides
             </Button>
             <Button 
               size="lg" 
-              variant="outline"
               onClick={onRightsClick}
-              className="bg-black/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/10 min-w-[200px]"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[200px]"
               data-testid="button-environmental-rights"
             >
               Environmental Rights
